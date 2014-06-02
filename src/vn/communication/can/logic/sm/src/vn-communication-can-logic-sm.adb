@@ -204,14 +204,14 @@ package body VN.Communication.CAN.Logic.SM is
 
          -- Since we assign an logical address, we know that this logical address exists on this subnet
          -- (We know that the receiver exists on that subnet because of the CUUID routing)
-         CAN_Routing.Insert(this.myTable, msgAssignAddr.Assigned_Base_Address, receiver); --new
+         CAN_Routing.Insert(this.myTable, msgAssignAddrBlock.Assigned_Base_Address, receiver); --new
       else
 
          CAN_Routing.Search(this.myTable, msg.Header.Destination, receiver, found, isDirect'Access);
 
          if isDirect then
-            VN.Text_IO.Put_Line("CAN routing: Sending VN message via direct routing. Destination " & msg.Header.Destination'Img &
-                                  " CAN address = " & receiver'Img);
+            VN.Communication.CAN.Logic.DebugOutput("CAN routing: Sending VN message via direct routing. Destination " & msg.Header.Destination'Img &
+                                                     " CAN address = " & receiver'Img, 1);
          end if;
       end if;
 
@@ -302,7 +302,7 @@ package body VN.Communication.CAN.Logic.SM is
                                                      " received LocalHello from CAN address " &
                                                      internal.Sender'Img & " CUUID(1)= " &
                                                      msgLocalHello.CUUID(1)'Img &
-                                                     " responded with LocalAck", 0);
+                                                     " responded with LocalAck", 1);
 
          elsif msg.Header.Opcode = VN.Message.OPCODE_LOCAL_ACK then
             -- ToDo: We should remember that our Local_Hello was acknowledged
