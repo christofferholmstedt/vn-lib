@@ -87,6 +87,12 @@ package body Subnet_Manager_Local is
                      -- Assigned_Address := Received_Address_Block; -- This is correct
                      Assigned_Address := Received_Address_Block - 1; -- This is for debugging
 
+                     -- TODO: Change this as this could come from another
+                     -- Subnet Manager and most likely is not directly from
+                     -- the CAS.
+                     --
+                     -- or with fix down below (never change source address
+                     -- on assign_address_block it will be true.
                      CAS_Logical_Address := Assign_Address_Block_Msg.Header.Source;
 
                   elsif Assign_Address_Block_Msg.Response_Type = VN.Message.Valid and
@@ -96,7 +102,7 @@ package body Subnet_Manager_Local is
                         -- receive.
                         To_Basic(Assign_Address_Block_Msg, Basic_Msg);
                         Basic_Msg.Header.Destination := VN.LOGICAL_ADDRES_UNKNOWN;
-                        Basic_Msg.Header.Source := SM_L_Info.Logical_Address;
+                        --Basic_Msg.Header.Source := SM_L_Info.Logical_Address;
 
                         VN.Text_IO.Put("SM-L SEND: ");
                         Global_Settings.Logger.Log(Basic_Msg);
@@ -105,17 +111,35 @@ package body Subnet_Manager_Local is
                         Unsigned_8_Buffer.Insert(Assign_Address_Block_Msg.CUUID(1), Distribute_Route_Buffer);
 
                         -- TODO: Temporary fix for only one SM-x
-                        SM_x_Logical_Address := Assign_Address_Block_Msg.Assigned_Base_Address;
+                        -- Need to map CUUIDs to assigned addresses to be
+                        -- able to send distribute route messages.
+                        -- SM_x_Logical_Address := Assign_Address_Block_Msg.Assigned_Base_Address;
+                        VN_Logical_Address_Buffer.Insert(Assign_Address_Block_Msg.Assigned_Base_Address, Distribute_Route_Buffer_Addresses);
                   end if;
+
+            elsif Basic_Msg.Header.Opcode = VN.Message.OPCODE_DISTRIBUTE_ROUTE then
+                  To_Distribute_Route(Basic_Msg, Distribute_Route_Msg);
+
+                  if Distribute_Route_Msg.Component_Type = VN.Message.CAS then
+                     CAS_Logical_Address := Distribute_Route_Msg.Component_Address;
+                     CAS_CUUID := Distribute_Route_Msg.CUUID(1);
+
+                  elsif Distribute_Route_Msg.Component_Type = VN.Message.LS then
+                     LS_Logical_Address := Distribute_Route_Msg.Component_Address;
+                     LS_CUUID := Distribute_Route_Msg.CUUID(1);
+                  end if;
+
             end if;
          end if;
 
          ----------------------------
          -- Send loop
          ----------------------------
-         -- Assign Address
+
+         -- Assign Address Blocks to other SM:s on the subnet
         if not Unsigned_8_Buffer.Empty(Request_Address_Block_Buffer) and
-            Has_Received_Address_Block then
+               Has_Received_Address_Block then
+
            Unsigned_8_Buffer.Remove(Temp_Uint8, Request_Address_Block_Buffer);
 
            Basic_Msg := VN.Message.Factory.Create(VN.Message.Type_Request_Address_Block);
@@ -130,13 +154,18 @@ package body Subnet_Manager_Local is
            Global_Settings.Logger.Log(Basic_Msg);
            Global_Settings.Com_SM_L.Send(Basic_Msg, Send_Status);
 
-        elsif not Unsigned_8_Buffer.Empty(Distribute_Route_Buffer) then
+         -- Distribute route, assumes that the LS and CAS are co-located.
+        elsif not Unsigned_8_Buffer.Empty(Distribute_Route_Buffer) and
+                  CAS_Logical_Address /= VN.LOGICAL_ADDRES_UNKNOWN and
+                  LS_Logical_Address /= VN.LOGICAL_ADDRES_UNKNOWN then
+
             Unsigned_8_Buffer.Remove(Temp_Uint8, Distribute_Route_Buffer);
+            VN_Logical_Address_Buffer.Remove(Temp_Logical_Address, Distribute_Route_Buffer_Addresses);
 
             -- CAS
             Basic_Msg := VN.Message.Factory.Create(VN.Message.Type_Distribute_Route);
             Basic_Msg.Header.Source := SM_L_Info.Logical_Address;
-            Basic_Msg.Header.Destination := SM_x_Logical_Address;
+            Basic_Msg.Header.Destination := Temp_Logical_Address;
             To_Distribute_Route(Basic_Msg, Distribute_Route_Msg);
             Distribute_Route_Msg.CUUID := (others => CAS_CUUID);
             Distribute_Route_Msg.Component_Address := CAS_Logical_Address;
@@ -160,7 +189,8 @@ package body Subnet_Manager_Local is
             Global_Settings.Com_SM_L.Send(Basic_Msg, Send_Status);
 
         elsif not Unsigned_8_Buffer.Empty(Assign_Address_Buffer) and
-            Has_Received_Address_Block then
+                  Has_Received_Address_Block then
+
            Unsigned_8_Buffer.Remove(Temp_Uint8, Assign_Address_Buffer);
 
            Basic_Msg := VN.Message.Factory.Create(VN.Message.Type_Assign_Address);
@@ -184,8 +214,11 @@ package body Subnet_Manager_Local is
                   VN_Logical_Address_Buffer.Insert(Assign_Address_Msg.Assigned_Address, Request_LS_Probe_Buffer);
             end if;
 
+            -- TODO: How will this work with multiple Subnet Managers?
+            -- Will distribute route messages arrive before this runs?
             if Sent_CAS_Request_LS_Probe = false and
                CAS_Logical_Address /= VN.LOGICAL_ADDRES_UNKNOWN then
+
                   VN_Logical_Address_Buffer.Insert(CAS_Logical_Address, Request_LS_Probe_Buffer);
                   Sent_CAS_Request_LS_Probe := true;
             end if;
