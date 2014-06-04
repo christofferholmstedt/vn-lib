@@ -21,7 +21,7 @@ package body Subnet_Manager_Local is
                        (Com => Global_Settings.Com_SM_L'Access,
                         CUUID => Global_Settings.CUUID_SM,
                         Debug_ID_String => "SM_L ",
-                        Logical_Address => 16#0000_0000#,
+                        Logical_Address => VN.LOGICAL_ADDRES_UNKNOWN,
                         Component_Type => VN.Message.SM_L,
                         Logger => Global_Settings.Logger);
       -------------------------------

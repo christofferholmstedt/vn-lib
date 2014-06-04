@@ -21,8 +21,8 @@ package VN.SM_Application_Layer_Logic is
          Com               : VN.Communication.Com_Access;
          CUUID             : VN.VN_CUUID; -- TODO: Assign default value.
          Debug_ID_String   : String(1 .. 5); -- TODO: Assign default value.
-         Logical_Address   : VN.VN_Logical_Address := 16#0000_0000#;
-         Component_Type    : VN.Message.VN_Component_Type := VN.Message.Other;
+         Logical_Address   : VN.VN_Logical_Address;
+         Component_Type    : VN.Message.VN_Component_Type;
          Logger            : Logging.Print_Out.Print_Out_Logger;
       end record;
 
