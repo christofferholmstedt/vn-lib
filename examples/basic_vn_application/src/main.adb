@@ -1,8 +1,8 @@
 with Global_Settings;
 with Subnet_Manager_Local;
 with Subnet_Manager_Local_H;
-with SM_x;
--- with Subnet_Manager_Local_X;
+--with SM_x;
+with Subnet_Manager_Local_X;
 with Central_Addressing_Service;
 with Lookup_Service;
 with Application;
