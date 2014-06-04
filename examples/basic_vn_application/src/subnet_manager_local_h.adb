@@ -87,13 +87,11 @@ package body Subnet_Manager_Local_H is
                      -- Assigned_Address := Received_Address_Block; -- This is correct
                      Assigned_Address := Received_Address_Block - 1; -- This is for debugging
 
-                     -- TODO: Change this as this could come from another
-                     -- Subnet Manager and most likely is not directly from
-                     -- the CAS.
-                     --
-                     -- or with fix down below (never change source address
-                     -- on assign_address_block it will be true.
-                     CAS_Logical_Address := Assign_Address_Block_Msg.Header.Source;
+                     -- TODO: Change this so CAS address could be dynamic
+                     -- It's hard coded in CAS logic as well.
+                     if Assign_Address_Block_Msg.Header.Source = VN.CAS_LOGICAL_ADDRESS then
+                        CAS_Logical_Address := Assign_Address_Block_Msg.Header.Source;
+                     end if;
 
                   elsif Assign_Address_Block_Msg.Response_Type = VN.Message.Valid and
                      Assign_Address_Block_Msg.CUUID /= Global_Settings.CUUID_SM_H then
@@ -102,7 +100,7 @@ package body Subnet_Manager_Local_H is
                         -- receive.
                         To_Basic(Assign_Address_Block_Msg, Basic_Msg);
                         Basic_Msg.Header.Destination := VN.LOGICAL_ADDRES_UNKNOWN;
-                        --Basic_Msg.Header.Source := SM_L_Info.Logical_Address;
+                        Basic_Msg.Header.Source := SM_L_Info.Logical_Address;
 
                         VN.Text_IO.Put("SM-H SEND: ");
                         Global_Settings.Logger.Log(Basic_Msg);
@@ -252,7 +250,7 @@ package body Subnet_Manager_Local_H is
    end SM_L;
 
    -- Start one instance of the SM-L
-   SM_L2: SM_L(20, Global_Settings.Cycle_Time_SM_L, 80, 3);
+   SM_L1: SM_L(20, Global_Settings.Cycle_Time_SM_L, 80, 3);
 
    ----------------------------
    -- Helper functions below
