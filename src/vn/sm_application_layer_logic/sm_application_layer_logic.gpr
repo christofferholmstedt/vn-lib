@@ -1,0 +1,18 @@
+with "../vn.gpr";
+with "../message/message.gpr";
+with "../communication/communication.gpr";
+with "../communication/protocol_routing/protocol_routing.gpr";
+with "../lib/logging/logging.gpr";
+
+-- with "../../src/vn/application_information/application_information.gpr";
+-- with "../../src/vn/sm_application_layer_logic/sm_application_layer_logic.gpr";
+
+project SM_Application_Layer_Logic is
+    for Source_Dirs use ("src");
+    for Object_Dir use "obj";
+
+    package Compiler is
+       for Local_Configuration_Pragmas use "project_pragmas";
+    end Compiler;
+
+end SM_Application_Layer_Logic;

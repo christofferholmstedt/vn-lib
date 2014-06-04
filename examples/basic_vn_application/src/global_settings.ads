@@ -68,9 +68,9 @@ package Global_Settings is
    -- Communication object for SM-L
    -- 1. Create a VN.Communication.Protocol_Routing.Protocol_Routing_Type
    --    for routing between protocols.
-   Com_SM_L : VN.Communication.Protocol_Routing.Protocol_Routing_Type;
-   Com_SM_X : VN.Communication.Protocol_Routing.Protocol_Routing_Type;
-   Com_SM_H : VN.Communication.Protocol_Routing.Protocol_Routing_Type;
+   Com_SM_L : aliased VN.Communication.Protocol_Routing.Protocol_Routing_Type;
+   Com_SM_X : aliased VN.Communication.Protocol_Routing.Protocol_Routing_Type;
+   Com_SM_H : aliased VN.Communication.Protocol_Routing.Protocol_Routing_Type;
 
    -- 2. Create a VN.Communication.Protocol_Routing.Protocol_Routing_Type
    --    for routing within Protected Object Subnet (PO_Router)
