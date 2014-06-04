@@ -37,8 +37,8 @@ package body Logging.Print_Out is
              VN.VN_Logical_Address'Image(Local_Hello_Msg.Header.Source) &
             " to " &
             VN.VN_Logical_Address'Image(Local_Hello_Msg.Header.Destination) &
-          --  " (logical addresses), Component_Type is " &
-          --  VN.Message.VN_Component_Type'Image(Local_Hello_Msg.Component_Type) &
+            " (logical addresses), Component_Type is " &
+            VN.Message.VN_Component_Type'Image(Local_Hello_Msg.Component_Type) &
             ", CUUID is " &
             Local_Hello_Msg.CUUID(1)'Img);
          Put_Line("");
@@ -60,11 +60,12 @@ package body Logging.Print_Out is
 
       elsif Message.Header.Opcode = OPCODE_REQUEST_ADDR_BLOCK then
          VN.Message.Request_Address_Block.To_Request_Address_Block(Message, Request_Address_Block_Msg);
+
          Put("Request Address Block from:" &
              VN.VN_Logical_Address'Image(Request_Address_Block_Msg.Header.Source) &
             " to " &
             VN.VN_Logical_Address'Image(Request_Address_Block_Msg.Header.Destination) &
-            " (logical addresses), from CUUID " &
+            " (logical addresses), for CUUID " &
             Request_Address_Block_Msg.CUUID(1)'Img);
          Put_Line("");
 

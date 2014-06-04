@@ -27,6 +27,7 @@ package Global_Settings is
    CUUID_App   : aliased VN.VN_CUUID := (others => 44);
    CUUID_SM_x  : aliased VN.VN_CUUID := (others => 55);
    CUUID_App2  : aliased VN.VN_CUUID := (others => 66);
+   CUUID_SM_H  : aliased VN.VN_CUUID := (others => 77);
 
    Cycle_Time_Applications : constant Positive := 2110000;
    Cycle_Time_SM_L         : constant Positive := 500000;
@@ -37,6 +38,7 @@ package Global_Settings is
    PO_To_LS          : aliased VN.Communication.PO.VN_PO;
    PO_To_SM_x        : aliased VN.Communication.PO.VN_PO;
    PO_To_App2        : aliased VN.Communication.PO.VN_PO;
+   PO_To_SM_H        : aliased VN.Communication.PO.VN_PO;
 
    -- Communication object for Application
    Com_Application   : VN.Communication.PO_Wrapper.VN_PO_Wrapper(
@@ -68,11 +70,13 @@ package Global_Settings is
    --    for routing between protocols.
    Com_SM_L : VN.Communication.Protocol_Routing.Protocol_Routing_Type;
    Com_SM_x : VN.Communication.Protocol_Routing.Protocol_Routing_Type;
+   Com_SM_H : VN.Communication.Protocol_Routing.Protocol_Routing_Type;
 
    -- 2. Create a VN.Communication.Protocol_Routing.Protocol_Routing_Type
    --    for routing within Protected Object Subnet (PO_Router)
    PO_Router: aliased VN.Communication.Protocol_Routing.Protocol_Routing_Type;
    PO_Router_SM_x: aliased VN.Communication.Protocol_Routing.Protocol_Routing_Type;
+   PO_Router_SM_H: aliased VN.Communication.Protocol_Routing.Protocol_Routing_Type;
 
    -- 3. Create all needed PO_Wrappers for the SM-L
    PO_Wrapper_To_Application: aliased VN.Communication.PO_Wrapper.VN_PO_Wrapper(
@@ -113,5 +117,16 @@ package Global_Settings is
    -- 4. Add PO_Router to Protocol_Router (during run time, main.adb).
    -- 5. Add all PO_Wrappers to the PO_Router (during run time, main.adb).
 
+   PO_Wrapper_SM_x_To_SM_H: aliased VN.Communication.PO_Wrapper.VN_PO_Wrapper(
+                                                            PO_To_SM_H'Access,
+                                                            CUUID_SM_x'Access,
+                                                            VN.Message.SM_L,
+                                                            True);
+
+   PO_Wrapper_SM_H_To_SM_x: aliased VN.Communication.PO_Wrapper.VN_PO_Wrapper(
+                                                            PO_To_SM_H'Access,
+                                                            CUUID_SM_H'Access,
+                                                            VN.Message.SM_x,
+                                                            False);
 
 end Global_Settings;
