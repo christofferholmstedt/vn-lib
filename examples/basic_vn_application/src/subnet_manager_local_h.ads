@@ -14,7 +14,7 @@ with VN.Message.Request_LS_Probe;
 with VN.Message.Distribute_Route;
 with Interfaces;
 
-package Subnet_Manager_Local_2 is
+package Subnet_Manager_Local_H is
 
    task type SM_L(Pri : System.Priority;
                      Cycle_Time : Positive;
@@ -85,4 +85,4 @@ package Subnet_Manager_Local_2 is
 
       function Has_Received_Address_Block return Boolean;
 
-end Subnet_Manager_Local_2;
+end Subnet_Manager_Local_H;

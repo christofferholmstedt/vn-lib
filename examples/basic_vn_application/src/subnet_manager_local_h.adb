@@ -10,7 +10,7 @@ with VN.Message.Request_Address_Block;
 with VN.Message.Distribute_Route;
 with Interfaces;
 
-package body Subnet_Manager_Local_2 is
+package body Subnet_Manager_Local_H is
 
    task body SM_L is
       use Ada.Real_Time;
@@ -277,4 +277,4 @@ package body Subnet_Manager_Local_2 is
       end if;
    end Has_Received_Address_Block;
 
-end Subnet_Manager_Local_2;
+end Subnet_Manager_Local_H;
