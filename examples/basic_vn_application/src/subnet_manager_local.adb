@@ -102,7 +102,7 @@ package body Subnet_Manager_Local is
                         -- receive.
                         To_Basic(Assign_Address_Block_Msg, Basic_Msg);
                         Basic_Msg.Header.Destination := VN.LOGICAL_ADDRES_UNKNOWN;
-                        --Basic_Msg.Header.Source := SM_L_Info.Logical_Address;
+                        Basic_Msg.Header.Source := SM_L_Info.Logical_Address;
 
                         VN.Text_IO.Put("SM-L SEND: ");
                         Global_Settings.Logger.Log(Basic_Msg);

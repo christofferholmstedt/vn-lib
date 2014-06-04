@@ -43,7 +43,7 @@ package body SM_X is
          ----------------------------
          -- Receive loop
          ----------------------------
-         Global_Settings.Com_SM_x.Receive(Basic_Msg, Recv_Status);
+         Global_Settings.Com_SM_X.Receive(Basic_Msg, Recv_Status);
 
          if Recv_Status = VN.NO_MSG_RECEIVED then
             VN.Text_IO.Put_Line("SM-x RECV: Empty.");
@@ -85,7 +85,7 @@ package body SM_X is
                      -- Assigned_Address := Received_Address_Block; -- This is correct
                      Assigned_Address := Received_Address_Block - 1; -- This is for debugging
 
-                     CAS_Logical_Address := Assign_Address_Block_Msg.Header.Source;
+                     -- CAS_Logical_Address := Assign_Address_Block_Msg.Header.Source;
 
                   elsif Assign_Address_Block_Msg.Response_Type = VN.Message.Valid and
                      Assign_Address_Block_Msg.CUUID /= Global_Settings.CUUID_SM_x then
@@ -98,7 +98,7 @@ package body SM_X is
 
                         VN.Text_IO.Put("SM-x SEND: ");
                         Global_Settings.Logger.Log(Basic_Msg);
-                        Global_Settings.Com_SM_x.Send(Basic_Msg, Send_Status);
+                        Global_Settings.Com_SM_X.Send(Basic_Msg, Send_Status);
 
                   end if;
 
@@ -127,7 +127,9 @@ package body SM_X is
 
          -- Assign Address
         elsif not Unsigned_8_Buffer.Empty(Request_Address_Block_Buffer) and
-            Has_Received_Address_Block then
+                  Has_Received_Address_Block and
+                  CAS_Logical_Address /= VN.LOGICAL_ADDRES_UNKNOWN then
+
            Unsigned_8_Buffer.Remove(Temp_Uint8, Request_Address_Block_Buffer);
 
            Basic_Msg := VN.Message.Factory.Create(VN.Message.Type_Request_Address_Block);
@@ -140,7 +142,7 @@ package body SM_X is
 
            VN.Text_IO.Put("SM-x SEND: ");
            Global_Settings.Logger.Log(Basic_Msg);
-           Global_Settings.Com_SM_x.Send(Basic_Msg, Send_Status);
+           Global_Settings.Com_SM_X.Send(Basic_Msg, Send_Status);
 
         elsif not Unsigned_8_Buffer.Empty(Assign_Address_Buffer) and
             Has_Received_Address_Block then
@@ -157,7 +159,7 @@ package body SM_X is
 
            VN.Text_IO.Put("SM-x SEND: ");
            Global_Settings.Logger.Log(Basic_Msg);
-           Global_Settings.Com_SM_x.Send(Basic_Msg, Send_Status);
+           Global_Settings.Com_SM_X.Send(Basic_Msg, Send_Status);
 
            -- TODO: Fix proper lookup table to keep track of LS, CAS and
            -- other SM-x
@@ -190,7 +192,7 @@ package body SM_X is
 
             VN.Text_IO.Put("SM-x SEND: ");
             Global_Settings.Logger.Log(Basic_Msg);
-            Global_Settings.Com_SM_x.Send(Basic_Msg, Send_Status);
+            Global_Settings.Com_SM_X.Send(Basic_Msg, Send_Status);
 
             -- Request LS Probe
             Basic_Msg := VN.Message.Factory.Create(VN.Message.Type_Request_LS_Probe);
@@ -203,7 +205,7 @@ package body SM_X is
 
             VN.Text_IO.Put("SM-x SEND: ");
             Global_Settings.Logger.Log(Basic_Msg);
-            Global_Settings.Com_SM_x.Send(Basic_Msg, Send_Status);
+            Global_Settings.Com_SM_X.Send(Basic_Msg, Send_Status);
 
         end if;
 

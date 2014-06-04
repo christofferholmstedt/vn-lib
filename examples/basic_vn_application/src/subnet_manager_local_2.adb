@@ -80,7 +80,7 @@ package body Subnet_Manager_Local_2 is
                   To_Assign_Address_Block(Basic_Msg, Assign_Address_Block_Msg);
 
                   if Assign_Address_Block_Msg.Response_Type = VN.Message.Valid and
-                     Assign_Address_Block_Msg.CUUID = Global_Settings.CUUID_SM then
+                     Assign_Address_Block_Msg.CUUID = Global_Settings.CUUID_SM_H then
 
                      Received_Address_Block := Assign_Address_Block_Msg.Assigned_Base_Address;
                      SM_L_Info.Logical_Address := Received_Address_Block;
@@ -96,7 +96,7 @@ package body Subnet_Manager_Local_2 is
                      CAS_Logical_Address := Assign_Address_Block_Msg.Header.Source;
 
                   elsif Assign_Address_Block_Msg.Response_Type = VN.Message.Valid and
-                     Assign_Address_Block_Msg.CUUID /= Global_Settings.CUUID_SM then
+                     Assign_Address_Block_Msg.CUUID /= Global_Settings.CUUID_SM_H then
 
                         -- TODO: Remove this send so it's not coupled with
                         -- receive.
