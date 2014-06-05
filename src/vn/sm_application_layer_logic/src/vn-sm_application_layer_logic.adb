@@ -26,88 +26,88 @@ package body VN.SM_Application_Layer_Logic is
    begin
       This.Component_Type := VN.Message.SM_L;
 
-      This.Com.Receive(Basic_Msg, Recv_Status);
+      This.Com.Receive(This.Basic_Msg, This.Recv_Status);
 
-      if Recv_Status = VN.NO_MSG_RECEIVED then
+      if This.Recv_Status = VN.NO_MSG_RECEIVED then
          VN.Text_IO.Put_Line(This.Debug_ID_String & "RECV: Empty.");
 
-      elsif Recv_Status = VN.MSG_RECEIVED_NO_MORE_AVAILABLE or
-         Recv_Status = VN.MSG_RECEIVED_MORE_AVAILABLE    then
+      elsif This.Recv_Status = VN.MSG_RECEIVED_NO_MORE_AVAILABLE or
+         This.Recv_Status = VN.MSG_RECEIVED_MORE_AVAILABLE    then
 
          -- Print debug text.
          VN.Text_IO.Put(This.Debug_ID_String & "RECV: ");
-         This.Logger.Log(Basic_Msg);
+         This.Logger.Log(This.Basic_Msg);
 
          -- Process incoming message.
-         if Basic_Msg.Header.Opcode = VN.Message.OPCODE_LOCAL_HELLO then
-            To_Local_Hello(Basic_Msg, Local_Hello_Msg);
+         if This.Basic_Msg.Header.Opcode = VN.Message.OPCODE_LOCAL_HELLO then
+            To_Local_Hello(This.Basic_Msg, This.Local_Hello_Msg);
 
-            if (Local_Hello_Msg.Component_Type = VN.Message.Other or
-               Local_Hello_Msg.Component_Type = VN.Message.LS) then
+            if (This.Local_Hello_Msg.Component_Type = VN.Message.Other or
+               This.Local_Hello_Msg.Component_Type = VN.Message.LS) then
 
-                  Unsigned_8_Buffer.Insert(Local_Hello_Msg.CUUID(1), Assign_Address_Buffer);
+                  Unsigned_8_Buffer.Insert(This.Local_Hello_Msg.CUUID(1), This.Assign_Address_Buffer);
 
-                  if Local_Hello_Msg.Component_Type = VN.Message.LS then
-                     LS_CUUID := Local_Hello_Msg.CUUID(1);
+                  if This.Local_Hello_Msg.Component_Type = VN.Message.LS then
+                     This.LS_CUUID := This.Local_Hello_Msg.CUUID(1);
                   end if;
 
-            elsif (Local_Hello_Msg.Component_Type = VN.Message.SM_L or
-                  Local_Hello_Msg.Component_Type = VN.Message.SM_x) then
-                  Unsigned_8_Buffer.Insert(Local_Hello_Msg.CUUID(1), Request_Address_Block_Buffer);
+            elsif (This.Local_Hello_Msg.Component_Type = VN.Message.SM_L or
+                  This.Local_Hello_Msg.Component_Type = VN.Message.SM_x) then
+                  Unsigned_8_Buffer.Insert(This.Local_Hello_Msg.CUUID(1), This.Request_Address_Block_Buffer);
 
-            elsif (Local_Hello_Msg.Component_Type = VN.Message.CAS) then
-                  CAS_CUUID := Local_Hello_Msg.CUUID(1);
+            elsif (This.Local_Hello_Msg.Component_Type = VN.Message.CAS) then
+                  This.CAS_CUUID := This.Local_Hello_Msg.CUUID(1);
             end if;
 
-         elsif Basic_Msg.Header.Opcode = VN.Message.OPCODE_ASSIGN_ADDR_BLOCK then
-               To_Assign_Address_Block(Basic_Msg, Assign_Address_Block_Msg);
+         elsif This.Basic_Msg.Header.Opcode = VN.Message.OPCODE_ASSIGN_ADDR_BLOCK then
+               To_Assign_Address_Block(This.Basic_Msg, This.Assign_Address_Block_Msg);
 
-               if Assign_Address_Block_Msg.Response_Type = VN.Message.Valid and
-                  Assign_Address_Block_Msg.CUUID = This.CUUID then
+               if This.Assign_Address_Block_Msg.Response_Type = VN.Message.Valid and
+                  This.Assign_Address_Block_Msg.CUUID = This.CUUID then
 
-                  Received_Address_Block := Assign_Address_Block_Msg.Assigned_Base_Address;
-                  This.Logical_Address := Received_Address_Block;
-                  -- Assigned_Address := Received_Address_Block; -- This is correct
-                  Assigned_Address := Received_Address_Block - 1; -- This is for debugging
+                  This.Received_Address_Block := This.Assign_Address_Block_Msg.Assigned_Base_Address;
+                  This.Logical_Address := This.Received_Address_Block;
+                  -- This.Assigned_Address := Received_Address_Block; -- This is correct
+                  This.Assigned_Address := This.Received_Address_Block - 1; -- This is for debugging
 
                   -- TODO: Change this so CAS address could be dynamic
                   -- It's hard coded in CAS logic as well.
-                  if Assign_Address_Block_Msg.Header.Source = VN.CAS_LOGICAL_ADDRESS then
-                     CAS_Logical_Address := Assign_Address_Block_Msg.Header.Source;
+                  if This.Assign_Address_Block_Msg.Header.Source = VN.CAS_LOGICAL_ADDRESS then
+                     This.CAS_Logical_Address := This.Assign_Address_Block_Msg.Header.Source;
                   end if;
 
-               elsif Assign_Address_Block_Msg.Response_Type = VN.Message.Valid and
-                  Assign_Address_Block_Msg.CUUID /= This.CUUID then
+               elsif This.Assign_Address_Block_Msg.Response_Type = VN.Message.Valid and
+                  This.Assign_Address_Block_Msg.CUUID /= This.CUUID then
 
                      -- TODO: Remove this send so it's not coupled with
                      -- receive.
-                     To_Basic(Assign_Address_Block_Msg, Basic_Msg);
-                     Basic_Msg.Header.Destination := VN.LOGICAL_ADDRES_UNKNOWN;
-                     Basic_Msg.Header.Source := This.Logical_Address;
+                     To_Basic(This.Assign_Address_Block_Msg, This.Basic_Msg);
+                     This.Basic_Msg.Header.Destination := VN.LOGICAL_ADDRES_UNKNOWN;
+                     This.Basic_Msg.Header.Source := This.Logical_Address;
 
                      VN.Text_IO.Put(This.Debug_ID_String & "SEND: ");
-                     This.Logger.Log(Basic_Msg);
-                     This.Com.Send(Basic_Msg, Send_Status);
+                     This.Logger.Log(This.Basic_Msg);
+                     This.Com.Send(This.Basic_Msg, This.Send_Status);
 
-                     Unsigned_8_Buffer.Insert(Assign_Address_Block_Msg.CUUID(1), Distribute_Route_Buffer);
+                     Unsigned_8_Buffer.Insert(This.Assign_Address_Block_Msg.CUUID(1), This.Distribute_Route_Buffer);
 
                      -- TODO: Temporary fix for only one SM-x
                      -- Need to map CUUIDs to assigned addresses to be
                      -- able to send distribute route messages.
-                     -- SM_x_Logical_Address := Assign_Address_Block_Msg.Assigned_Base_Address;
-                     VN_Logical_Address_Buffer.Insert(Assign_Address_Block_Msg.Assigned_Base_Address, Distribute_Route_Buffer_Addresses);
+                     -- SM_x_Logical_Address := This.Assign_Address_Block_Msg.Assigned_Base_Address;
+                     VN_Logical_Address_Buffer.Insert(This.Assign_Address_Block_Msg.Assigned_Base_Address, This.Distribute_Route_Buffer_Addresses);
                end if;
 
-         elsif Basic_Msg.Header.Opcode = VN.Message.OPCODE_DISTRIBUTE_ROUTE then
-               To_Distribute_Route(Basic_Msg, Distribute_Route_Msg);
+         elsif This.Basic_Msg.Header.Opcode = VN.Message.OPCODE_DISTRIBUTE_ROUTE then
+               To_Distribute_Route(This.Basic_Msg, This.Distribute_Route_Msg);
 
-               if Distribute_Route_Msg.Component_Type = VN.Message.CAS then
-                  CAS_Logical_Address := Distribute_Route_Msg.Component_Address;
-                  CAS_CUUID := Distribute_Route_Msg.CUUID(1);
+               if This.Distribute_Route_Msg.Component_Type = VN.Message.CAS then
+                  This.CAS_Logical_Address := This.Distribute_Route_Msg.Component_Address;
+                  This.CAS_CUUID := This.Distribute_Route_Msg.CUUID(1);
 
-               elsif Distribute_Route_Msg.Component_Type = VN.Message.LS then
-                  LS_Logical_Address := Distribute_Route_Msg.Component_Address;
-                  LS_CUUID := Distribute_Route_Msg.CUUID(1);
+               elsif This.Distribute_Route_Msg.Component_Type = VN.Message.LS then
+                  This.LS_Logical_Address := This.Distribute_Route_Msg.Component_Address;
+                  This.LS_CUUID := This.Distribute_Route_Msg.CUUID(1);
                end if;
 
          end if;
@@ -128,107 +128,108 @@ package body VN.SM_Application_Layer_Logic is
    begin
 
       -- Assign Address Blocks to other SM:s on the subnet
-      if not Unsigned_8_Buffer.Empty(Request_Address_Block_Buffer) and
-               Has_Received_Address_Block and
-               CAS_Logical_Address /= VN.LOGICAL_ADDRES_UNKNOWN then
+      if not Unsigned_8_Buffer.Empty(This.Request_Address_Block_Buffer) and
+               This.Has_Received_Address_Block and
+               This.CAS_Logical_Address /= VN.LOGICAL_ADDRES_UNKNOWN then
 
-         Unsigned_8_Buffer.Remove(Temp_Uint8, Request_Address_Block_Buffer);
+         Unsigned_8_Buffer.Remove(This.Temp_Uint8, This.Request_Address_Block_Buffer);
 
-         Basic_Msg := VN.Message.Factory.Create(VN.Message.Type_Request_Address_Block);
-         Basic_Msg.Header.Source := This.Logical_Address;
-         Basic_Msg.Header.Destination := CAS_Logical_Address;
+         This.Basic_Msg := VN.Message.Factory.Create(VN.Message.Type_Request_Address_Block);
+         This.Basic_Msg.Header.Source := This.Logical_Address;
+         This.Basic_Msg.Header.Destination := This.CAS_Logical_Address;
 
-         To_Request_Address_Block(Basic_Msg, Request_Address_Block_Msg);
-         Request_Address_Block_Msg.CUUID := (others => Temp_Uint8);
-         To_Basic(Request_Address_Block_Msg, Basic_Msg);
+         To_Request_Address_Block(This.Basic_Msg, This.Request_Address_Block_Msg);
+         This.Request_Address_Block_Msg.CUUID := (others => This.Temp_Uint8);
+         To_Basic(This.Request_Address_Block_Msg, This.Basic_Msg);
 
          VN.Text_IO.Put(This.Debug_ID_String & "SEND: ");
-         This.Logger.Log(Basic_Msg);
-         This.Com.Send(Basic_Msg, Send_Status);
+         This.Logger.Log(This.Basic_Msg);
+         This.Com.Send(This.Basic_Msg, This.Send_Status);
 
       -- Distribute route, assumes that the LS and CAS are co-located.
-      elsif not Unsigned_8_Buffer.Empty(Distribute_Route_Buffer) and
-               CAS_Logical_Address /= VN.LOGICAL_ADDRES_UNKNOWN and
-               LS_Logical_Address /= VN.LOGICAL_ADDRES_UNKNOWN then
+      elsif not Unsigned_8_Buffer.Empty(This.Distribute_Route_Buffer) and
+               This.CAS_Logical_Address /= VN.LOGICAL_ADDRES_UNKNOWN and
+               This.LS_Logical_Address /= VN.LOGICAL_ADDRES_UNKNOWN then
 
-         Unsigned_8_Buffer.Remove(Temp_Uint8, Distribute_Route_Buffer);
-         VN_Logical_Address_Buffer.Remove(Temp_Logical_Address, Distribute_Route_Buffer_Addresses);
+         Unsigned_8_Buffer.Remove(This.Temp_Uint8, This.Distribute_Route_Buffer);
+         VN_Logical_Address_Buffer.Remove(This.Temp_Logical_Address, This.Distribute_Route_Buffer_Addresses);
 
          -- CAS
-         Basic_Msg := VN.Message.Factory.Create(VN.Message.Type_Distribute_Route);
-         Basic_Msg.Header.Source := This.Logical_Address;
-         Basic_Msg.Header.Destination := Temp_Logical_Address;
-         To_Distribute_Route(Basic_Msg, Distribute_Route_Msg);
-         Distribute_Route_Msg.CUUID := (others => CAS_CUUID);
-         Distribute_Route_Msg.Component_Address := CAS_Logical_Address;
-         Distribute_Route_Msg.Component_Type:= VN.Message.CAS;
+         This.Basic_Msg := VN.Message.Factory.Create(VN.Message.Type_Distribute_Route);
+         This.Basic_Msg.Header.Source := This.Logical_Address;
+         This.Basic_Msg.Header.Destination := This.Temp_Logical_Address;
+         To_Distribute_Route(This.Basic_Msg, This.Distribute_Route_Msg);
+         This.Distribute_Route_Msg.CUUID := (others => This.CAS_CUUID);
+         This.Distribute_Route_Msg.Component_Address := This.CAS_Logical_Address;
+         This.Distribute_Route_Msg.Component_Type:= VN.Message.CAS;
 
-         To_Basic(Distribute_Route_Msg, Basic_Msg);
+         To_Basic(This.Distribute_Route_Msg, This.Basic_Msg);
 
          VN.Text_IO.Put(This.Debug_ID_String & "SEND: ");
-         This.Logger.Log(Basic_Msg);
-         This.Com.Send(Basic_Msg, Send_Status);
+         This.Logger.Log(This.Basic_Msg);
+         This.Com.Send(This.Basic_Msg, This.Send_Status);
 
          -- LS
-         Distribute_Route_Msg.CUUID := (others => LS_CUUID);
-         Distribute_Route_Msg.Component_Address := LS_Logical_Address;
-         Distribute_Route_Msg.Component_Type:= VN.Message.LS;
+         This.Distribute_Route_Msg.CUUID := (others => This.LS_CUUID);
+         This.Distribute_Route_Msg.Component_Address := This.LS_Logical_Address;
+         This.Distribute_Route_Msg.Component_Type:= VN.Message.LS;
 
-         To_Basic(Distribute_Route_Msg, Basic_Msg);
-
-         VN.Text_IO.Put(This.Debug_ID_String & "SEND: ");
-         This.Logger.Log(Basic_Msg);
-         This.Com.Send(Basic_Msg, Send_Status);
-
-      elsif not Unsigned_8_Buffer.Empty(Assign_Address_Buffer) and
-               Has_Received_Address_Block then
-
-         Unsigned_8_Buffer.Remove(Temp_Uint8, Assign_Address_Buffer);
-
-         Basic_Msg := VN.Message.Factory.Create(VN.Message.Type_Assign_Address);
-         Basic_Msg.Header.Source := This.Logical_Address;
-         Basic_Msg.Header.Destination := VN.LOGICAL_ADDRES_UNKNOWN;
-         To_Assign_Address(Basic_Msg, Assign_Address_Msg);
-         Assign_Address_Msg.CUUID := (others => Temp_Uint8);
-         Assign_Address_Msg.Assigned_Address := Get_Address_To_Assign(Temp_Uint8);
-
-         To_Basic(Assign_Address_Msg, Basic_Msg);
+         To_Basic(This.Distribute_Route_Msg, This.Basic_Msg);
 
          VN.Text_IO.Put(This.Debug_ID_String & "SEND: ");
-         This.Logger.Log(Basic_Msg);
-         This.Com.Send(Basic_Msg, Send_Status);
+         This.Logger.Log(This.Basic_Msg);
+         This.Com.Send(This.Basic_Msg, This.Send_Status);
+
+      elsif not Unsigned_8_Buffer.Empty(This.Assign_Address_Buffer) and
+               This.Has_Received_Address_Block then
+
+         Unsigned_8_Buffer.Remove(This.Temp_Uint8, This.Assign_Address_Buffer);
+
+         This.Basic_Msg := VN.Message.Factory.Create(VN.Message.Type_Assign_Address);
+         This.Basic_Msg.Header.Source := This.Logical_Address;
+         This.Basic_Msg.Header.Destination := VN.LOGICAL_ADDRES_UNKNOWN;
+         To_Assign_Address(This.Basic_Msg, This.Assign_Address_Msg);
+         This.Assign_Address_Msg.CUUID := (others => This.Temp_Uint8);
+         This.Get_Address_To_Assign(This.Temp_Uint8, This.Temp_Logical_Address);
+         This.Assign_Address_Msg.Assigned_Address := This.Temp_Logical_Address;
+
+         To_Basic(This.Assign_Address_Msg, This.Basic_Msg);
+
+         VN.Text_IO.Put(This.Debug_ID_String & "SEND: ");
+         This.Logger.Log(This.Basic_Msg);
+         This.Com.Send(This.Basic_Msg, This.Send_Status);
 
          -- TODO: Fix proper lookup table to keep track of LS, CAS and
          -- other SM-x
-         if Temp_Uint8 = LS_CUUID then
-               LS_Logical_Address := Assign_Address_Msg.Assigned_Address;
+         if This.Temp_Uint8 = This.LS_CUUID then
+               This.LS_Logical_Address := This.Assign_Address_Msg.Assigned_Address;
             else
-               VN_Logical_Address_Buffer.Insert(Assign_Address_Msg.Assigned_Address, Request_LS_Probe_Buffer);
+               VN_Logical_Address_Buffer.Insert(This.Assign_Address_Msg.Assigned_Address, This.Request_LS_Probe_Buffer);
          end if;
 
          -- TODO: How will this work with multiple Subnet Managers?
          -- Will distribute route messages arrive before this runs?
-         if Sent_CAS_Request_LS_Probe = false and
-            CAS_Logical_Address /= VN.LOGICAL_ADDRES_UNKNOWN then
+         if This.Sent_CAS_Request_LS_Probe = false and
+            This.CAS_Logical_Address /= VN.LOGICAL_ADDRES_UNKNOWN then
 
-               VN_Logical_Address_Buffer.Insert(CAS_Logical_Address, Request_LS_Probe_Buffer);
-               Sent_CAS_Request_LS_Probe := true;
+               VN_Logical_Address_Buffer.Insert(This.CAS_Logical_Address, This.Request_LS_Probe_Buffer);
+               This.Sent_CAS_Request_LS_Probe := true;
          end if;
 
-      elsif not VN_Logical_Address_Buffer.Empty(Request_LS_Probe_Buffer) then
-         VN_Logical_Address_Buffer.Remove(Temp_Logical_Address, Request_LS_Probe_Buffer);
+      elsif not VN_Logical_Address_Buffer.Empty(This.Request_LS_Probe_Buffer) then
+         VN_Logical_Address_Buffer.Remove(This.Temp_Logical_Address, This.Request_LS_Probe_Buffer);
 
-         Basic_Msg := VN.Message.Factory.Create(VN.Message.Type_Request_LS_Probe);
-         Basic_Msg.Header.Source := This.Logical_Address;
-         Basic_Msg.Header.Destination := LS_Logical_Address;
-         To_Request_LS_Probe(Basic_Msg, Request_LS_Probe_Msg);
-         Request_LS_Probe_Msg.Component_Address := Temp_Logical_Address;
+         This.Basic_Msg := VN.Message.Factory.Create(VN.Message.Type_Request_LS_Probe);
+         This.Basic_Msg.Header.Source := This.Logical_Address;
+         This.Basic_Msg.Header.Destination := This.LS_Logical_Address;
+         To_Request_LS_Probe(This.Basic_Msg, This.Request_LS_Probe_Msg);
+         This.Request_LS_Probe_Msg.Component_Address := This.Temp_Logical_Address;
 
-         To_Basic(Request_LS_Probe_Msg, Basic_Msg);
+         To_Basic(This.Request_LS_Probe_Msg, This.Basic_Msg);
 
          VN.Text_IO.Put(This.Debug_ID_String & "SEND: ");
-         This.Logger.Log(Basic_Msg);
-         This.Com.Send(Basic_Msg, Send_Status);
+         This.Logger.Log(This.Basic_Msg);
+         This.Com.Send(This.Basic_Msg, This.Send_Status);
 
       end if;
    end Send_Loop;
@@ -236,20 +237,23 @@ package body VN.SM_Application_Layer_Logic is
    ----------------------------
    -- Helper functions below
    ----------------------------
-   function Get_Address_To_Assign(CUUID_Uint8: in Interfaces.Unsigned_8)
-         return VN.VN_Logical_Address is
+   procedure Get_Address_To_Assign(This: in out SM_Logic_Type;
+                                   CUUID_Uint8: in Interfaces.Unsigned_8;
+                                   Log_Address: out VN.VN_Logical_Address)
+   is
       use VN;
    begin
       -- TODO: This function doesn't take into account the CUUID, which it
       -- should.
-      Assigned_Address := Assigned_Address + 1;
-      return Assigned_Address + 1;
+      This.Assigned_Address := This.Assigned_Address + 1;
+      Log_Address := This.Assigned_Address + 1;
    end Get_Address_To_Assign;
 
-   function Has_Received_Address_Block return Boolean is
+   function Has_Received_Address_Block(This: in SM_Logic_Type)
+                              return Boolean is
       use VN;
    begin
-      if Received_Address_Block /= VN.LOGICAL_ADDRES_UNKNOWN then
+      if This.Received_Address_Block /= VN.LOGICAL_ADDRES_UNKNOWN then
          return true;
       else
          return false;

@@ -28,6 +28,12 @@ package VN.SM_Application_Layer_Logic is
 
    private
 
+      package VN_Logical_Address_Buffer is
+         new Buffers(VN.VN_Logical_Address);
+
+      package Unsigned_8_Buffer is
+         new Buffers(Interfaces.Unsigned_8);
+
    type SM_Logic_Type(Com_Object       : VN.Communication.Com_Access;
                       CUUID_In         : access VN.VN_CUUID;
                       Debug_ID_String2 : access String;
@@ -40,13 +46,7 @@ package VN.SM_Application_Layer_Logic is
          Logical_Address   : VN.VN_Logical_Address;
          Component_Type    : VN.Message.VN_Component_Type;
          Logger            : Logging.Print_Out.Print_Out_Logger := Logger2.all;
-      end record;
 
-      package VN_Logical_Address_Buffer is
-         new Buffers(VN.VN_Logical_Address);
-
-      package Unsigned_8_Buffer is
-         new Buffers(Interfaces.Unsigned_8);
 
       Basic_Msg: VN.Message.VN_Message_Basic;
       Local_Hello_Msg: VN.Message.Local_Hello.VN_Message_Local_Hello;
@@ -92,9 +92,13 @@ package VN.SM_Application_Layer_Logic is
       -- TODO: Change this buffer to some kind of data store.
       Request_Address_Block_Buffer: Unsigned_8_Buffer.Buffer(10);
 
-      function Get_Address_To_Assign(CUUID_Uint8: in Interfaces.Unsigned_8)
-         return VN.VN_Logical_Address;
+      end record;
 
-      function Has_Received_Address_Block return Boolean;
+      procedure Get_Address_To_Assign(This: in out SM_Logic_Type;
+                                   CUUID_Uint8: in Interfaces.Unsigned_8;
+                                   Log_Address: out VN.VN_Logical_Address);
+
+      function Has_Received_Address_Block(This: in SM_Logic_Type)
+                     return Boolean;
 
 end VN.SM_Application_Layer_Logic;
