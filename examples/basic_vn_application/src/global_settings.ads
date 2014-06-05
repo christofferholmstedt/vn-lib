@@ -24,23 +24,27 @@ package Global_Settings is
    CUUID_CAS   : aliased VN.VN_CUUID := (others => 11);
    CUUID_SM    : aliased VN.VN_CUUID := (others => 22);
    CUUID_LS    : aliased VN.VN_CUUID := (others => 33);
-   CUUID_App   : aliased VN.VN_CUUID := (others => 44);
    CUUID_SM_X  : aliased VN.VN_CUUID := (others => 55);
-   CUUID_App2  : aliased VN.VN_CUUID := (others => 66);
    CUUID_SM_H  : aliased VN.VN_CUUID := (others => 77);
    CUUID_SM_K  : aliased VN.VN_CUUID := (others => 99);
+
+   CUUID_App   : aliased VN.VN_CUUID := (others => 44);
+   CUUID_App2  : aliased VN.VN_CUUID := (others => 66);
+   CUUID_App_K : aliased VN.VN_CUUID := (others => 63);
 
    Cycle_Time_Applications : constant Positive := 2110000;
    Cycle_Time_SM_L         : constant Positive := 500000;
 
    -- Communication between Application, CAS, LS and SM-L
-   PO_To_Application : aliased VN.Communication.PO.VN_PO;
    PO_To_CAS         : aliased VN.Communication.PO.VN_PO;
    PO_To_LS          : aliased VN.Communication.PO.VN_PO;
    PO_To_SM_X        : aliased VN.Communication.PO.VN_PO;
-   PO_To_App2        : aliased VN.Communication.PO.VN_PO;
    PO_To_SM_H        : aliased VN.Communication.PO.VN_PO;
    PO_To_SM_K        : aliased VN.Communication.PO.VN_PO;
+
+   PO_To_Application : aliased VN.Communication.PO.VN_PO;
+   PO_To_App2        : aliased VN.Communication.PO.VN_PO;
+   PO_To_App_K       : aliased VN.Communication.PO.VN_PO;
 
    -- Communication object for Application
    Com_Application   : VN.Communication.PO_Wrapper.VN_PO_Wrapper(
@@ -61,12 +65,17 @@ package Global_Settings is
                                                             VN.Message.LS,
                                                             False);
 
-   Com_App2            : VN.Communication.PO_Wrapper.VN_PO_Wrapper(
+   Com_App2          : VN.Communication.PO_Wrapper.VN_PO_Wrapper(
                                                             PO_To_App2'Access,
                                                             CUUID_App2'Access,
                                                             VN.Message.Other,
                                                             False);
 
+   Com_App_K         : VN.Communication.PO_Wrapper.VN_PO_Wrapper(
+                                                            PO_To_App_K'Access,
+                                                            CUUID_App_K'Access,
+                                                            VN.Message.Other,
+                                                            False);
    -- Communication object for SM-L
    -- 1. Create a VN.Communication.Protocol_Routing.Protocol_Routing_Type
    --    for routing between protocols.
@@ -146,4 +155,10 @@ package Global_Settings is
                                                             CUUID_SM_K'Access,
                                                             VN.Message.SM_x,
                                                             False);
+
+   PO_Wrapper_SM_K_To_App_K: aliased VN.Communication.PO_Wrapper.VN_PO_Wrapper(
+                                                            PO_To_App_K'Access,
+                                                            CUUID_SM_K'Access,
+                                                            VN.Message.SM_L,
+                                                            True);
 end Global_Settings;

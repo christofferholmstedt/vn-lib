@@ -7,6 +7,7 @@ with Central_Addressing_Service;
 with Lookup_Service;
 with Application;
 with App2;
+with App_K;
 
 procedure Main is
 begin
@@ -15,6 +16,7 @@ begin
    Global_Settings.Com_CAS.Init;
    Global_Settings.Com_LS.Init;
    Global_Settings.Com_App2.Init;
+   Global_Settings.Com_App_K.Init;
    Global_Settings.PO_Wrapper_To_SM_L.Init;
    Global_Settings.PO_Wrapper_SM_H_To_SM_X.Init;
    Global_Settings.PO_Wrapper_SM_K_To_SM_X.Init;
@@ -36,4 +38,5 @@ begin
 
    Global_Settings.Com_SM_K.Add_Interface(Global_Settings.PO_Router_SM_K'Access);
    Global_Settings.PO_Router_SM_K.Add_Interface(Global_Settings.PO_Wrapper_SM_K_To_SM_X'Access);
+   Global_Settings.PO_Router_SM_K.Add_Interface(Global_Settings.PO_Wrapper_SM_K_To_App_K'Access);
 end Main;

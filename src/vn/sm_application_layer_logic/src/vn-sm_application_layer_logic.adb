@@ -216,7 +216,8 @@ package body VN.SM_Application_Layer_Logic is
                This.Sent_CAS_Request_LS_Probe := true;
          end if;
 
-      elsif not VN_Logical_Address_Buffer.Empty(This.Request_LS_Probe_Buffer) then
+      elsif not VN_Logical_Address_Buffer.Empty(This.Request_LS_Probe_Buffer) and
+                This.LS_Logical_Address /= VN.LOGICAL_ADDRES_UNKNOWN then
          VN_Logical_Address_Buffer.Remove(This.Temp_Logical_Address, This.Request_LS_Probe_Buffer);
 
          This.Basic_Msg := VN.Message.Factory.Create(VN.Message.Type_Request_LS_Probe);
