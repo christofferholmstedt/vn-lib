@@ -3,6 +3,7 @@ with System;
 with Ada.Text_IO;
 with Buffers;
 with VN;
+-- with VN.SM_Hidden_Variables;
 with VN.Communication;
 with VN.Message.Factory;
 with VN.Message.Local_Hello;
@@ -16,24 +17,29 @@ with Logging.Print_Out;
 
 package VN.SM_Application_Layer_Logic is
 
-   type SM_Logic_Type is tagged private limited
-      record
-         Com               : VN.Communication.Com_Access;
-         CUUID             : VN.VN_CUUID; -- TODO: Assign default value.
-         Debug_ID_String   : String(1 .. 5); -- TODO: Assign default value.
-         Logical_Address   : VN.VN_Logical_Address;
-         Component_Type    : VN.Message.VN_Component_Type;
-         Logger            : Logging.Print_Out.Print_Out_Logger;
-      end record;
+   type SM_Logic_Type(Com_Object       : VN.Communication.Com_Access;
+                      CUUID_In         : VN.VN_CUUID;
+                      Debug_ID_String2 : String;
+                      Logger2          : Logging.Print_Out.Print_Out_Logger)
+      is tagged limited private;
 
    procedure Receive_Loop(This: in out SM_Logic_Type);
    procedure Send_Loop(This: in out SM_Logic_Type);
 
    private
 
-   type SM_Logic_Type is tagged limited
+   type SM_Logic_Type(Com_Object       : VN.Communication.Com_Access;
+                      CUUID_In         : VN.VN_CUUID;
+                      Debug_ID_String2 : String;
+                      Logger2          : Logging.Print_Out.Print_Out_Logger)
+         is tagged limited with
       record
-         Test               : VN.Communication.Com_Access;
+         Com               : VN.Communication.Com_Access := Com_Object;
+         CUUID             : VN.VN_CUUID := CUUID_In;
+         Debug_ID_String   : String(1 .. 5) := Debug_ID_String2;
+         Logical_Address   : VN.VN_Logical_Address;
+         Component_Type    : VN.Message.VN_Component_Type;
+         Logger            : Logging.Print_Out.Print_Out_Logger := Logger2;
       end record;
 
       package VN_Logical_Address_Buffer is

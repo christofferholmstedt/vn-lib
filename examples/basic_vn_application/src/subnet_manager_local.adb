@@ -17,19 +17,16 @@ package body Subnet_Manager_Local is
       -------------------------------
       --- Subnet Manager Settings ---
       -------------------------------
-      SM_Logic : VN.SM_Application_Layer_Logic.SM_Logic_Type :=
-                       (Com => Global_Settings.Com_SM_L'Access,
-                        CUUID => Global_Settings.CUUID_SM,
-                        Debug_ID_String => "SM_L ",
-                        Logical_Address => VN.LOGICAL_ADDRES_UNKNOWN,
-                        Component_Type => VN.Message.SM_L,
-                        Logger => Global_Settings.Logger);
+      SM_Logic : VN.SM_Application_Layer_Logic.SM_Logic_Type(
+                        Global_Settings.Com_SM_L'Access,
+                        Global_Settings.CUUID_SM,
+                        "SM_L ",
+                        Global_Settings.Logger);
       -------------------------------
       -------------------------------
       -------------------------------
 
    begin
-
       Global_Settings.Start_Time.Get(Next_Period);
       VN.Text_IO.Put_Line(SM_Logic.Debug_ID_String & "STAT: Starts.");
 

@@ -17,16 +17,11 @@ package body Subnet_Manager_Local_H is
       -------------------------------
       --- Subnet Manager Settings ---
       -------------------------------
-      SM_Logic : VN.SM_Application_Layer_Logic.SM_Logic_Type :=
-                       (Com => Global_Settings.Com_SM_H'Access,
-                        CUUID => Global_Settings.CUUID_SM_H,
-                        Debug_ID_String => "jojo ",
-                        Logical_Address => VN.LOGICAL_ADDRES_UNKNOWN,
-                        Component_Type => VN.Message.SM_L,
-                        Logger => Global_Settings.Logger);
-      -------------------------------
-      -------------------------------
-      -------------------------------
+      SM_Logic : VN.SM_Application_Layer_Logic.SM_Logic_Type(
+                        Global_Settings.Com_SM_H'Access,
+                        Global_Settings.CUUID_SM_H,
+                        "jojo",
+                        Global_Settings.Logger);
 
    begin
 
