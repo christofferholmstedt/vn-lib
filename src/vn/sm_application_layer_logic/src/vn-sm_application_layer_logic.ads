@@ -16,7 +16,7 @@ with Logging.Print_Out;
 
 package VN.SM_Application_Layer_Logic is
 
-   type SM_Logic_Type is tagged limited
+   type SM_Logic_Type is tagged private limited
       record
          Com               : VN.Communication.Com_Access;
          CUUID             : VN.VN_CUUID; -- TODO: Assign default value.
@@ -30,6 +30,11 @@ package VN.SM_Application_Layer_Logic is
    procedure Send_Loop(This: in out SM_Logic_Type);
 
    private
+
+   type SM_Logic_Type is tagged limited
+      record
+         Test               : VN.Communication.Com_Access;
+      end record;
 
       package VN_Logical_Address_Buffer is
          new Buffers(VN.VN_Logical_Address);
