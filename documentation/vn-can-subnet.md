@@ -2,12 +2,16 @@ VN CAN Subnet Protocol
 ==========================
 This protocol defines the communication for Virtual Network over the Controller Area Network.
 
+Copyright (c) 2014 All Rights Reserved  <br/>
+Author: Nils Brynedal Ignell
+
 ## High level
 
 ### Identifiers and addresses
 **There exists two forms of identifiers in this protocol:** 
-  * **The Component Universally Unique Identifier (CUUID)**  is a high level identifier that is to be unique worldwide for the particular component. The length of the CUUID is 128 bits (16 bytes). Any component on a VN network needs a CUUID.
-  * **The Universally Unique CAN Identifier (UCID)** is a low level identifier that is to be unique on the VN-CAN network for the particular component. The length of the UCID is 28 bits. Any component on the VN-CAN network will need a UCID.
+  * **The Component Universally Unique Identifier (CUUID)**  is a high level identifier that is to be unique worldwide for the particular component. The length of the CUUID is 128 bits (16 bytes). Any component on a VN network needs a CUUID. The CUUID is defined in the SPA protocol.
+  * **The Universally Unique CAN Identifier (UCID)** is a low level identifier that is to be unique on the VN-CAN network for the particular component. The length of the UCID is 28 bits. 
+  Any component on the VN-CAN network will need a UCID. The UCID is only relevant in the VN-CAN subnet.
 
 **There exists two forms of addresses in this protocol:**
   * **The logical addresses.**  Defined in the VN protocol.
@@ -22,6 +26,8 @@ This protocol defines the communication for Virtual Network over the Controller 
   * A *CUUID routing* table, connecting a given CUUID to a subnet address. This
     table is used in some special cases of VN messages (e.g. **AssignAddr**)
     that cannot rely on logical addresses for routing.
+  * *SentFrom*, a list (or hash table, the exact implementation is irrelevant) of all logical addresses the unit has sent VN messages from.
+  * *ReceivedFrom*, a list (or hash table) of of all logical addresses the unit has received VN messages from.
 
 
 ### Interface
@@ -31,7 +37,7 @@ This protocol defines the communication for Virtual Network over the Controller 
     is written to the send buffer if it is not full.
   * *Receive*. Will give a VN message as an out-variable, another out-variable
     will tell the outcome of the call, i.e. “No message received”, “Message
-    received, buffer empty” and “Message received, more available”.
+    received, buffer empty” or “Message received, more available”.
 
 ### Unit discovery process
 Section *Unit discovery process* in *VN generic subnet protocol* shall be followed. Section *Low level* will give further specifications for how this is to be done.
@@ -72,7 +78,7 @@ The message ID is divided according to:
 *Please note:* Even though CAN addresses are 8 bit, addresses over 127 will never be used as a sender address since the maximum number of allowed CAN nodes on a CAN network is 128 one only needs addresses 0 through 127. This means that only 7 bits are needed for the Sender address.
 
 #### Message priority
-To be determined, set by higher protocols?
+The message priority field is not used in the current implementation. Currently, the highest priority is always used.
 
 #### Message type
 The types of messages present are listed below. Please note that in the case of two messages having equal priory fields the message type field will determine priority. A lower Message type number will give a higher priority.
@@ -183,17 +189,17 @@ The CAN addresses are grouped according to the table below. Please note that *no
  1.  Each SM-CAN shall send a RequestCANAddress message when it starts.
  2.  The SM-CAN shall delay for XXXXX ms. During this time it shall listen to **RequestCANAddress** and any **Normal CAN message**.  <br/>
  	2.1.    If the SM-CAN receives a **Normal CAN message**, or a **RequestCANAddress** message from an SM-CAN with a lower UCID, it shall become an SM-CAN slave.  <br/>
- 	2.2.    If the  SM-CAN receives a **RequestCANAddress** message from an SM-CAN with a higher UCID it shall respond with a **RequestCANAddress** message of its own. 
+ 	2.2.    If the  SM-CAN receives a **RequestCANAddress** message from an SM-CAN with a higher UCID it shall respond with a **RequestCANAddress** message of its own and reset its delay timer. 
  3.  If the delay has passed without the SM-CAN becoming a slave it shall become an SM-CAN master.
  4.  If the SM-CAN master receives a **RequestCANAddress** message from an SM-CAN it shall respond with a *Normal CAN message*, such as the **CANMasterAssigned** message. *This responsibility of the SM-CAN master remains indefinitely.*
  5.  Once assigned as a slave, an SM-CAN has no further responsibilities with regards to the SM-CAN master negotiation process.
  6.  Once a SM-CAN has been assigned an SM-CAN master, it shall be ready to receive VN messages. <br/>
-This means that it shall listen for StartTransmission and Transmission messages and be ready to answer with FlowControl messages.
+This means that it shall listen for **StartTransmission** and **Transmission** messages and be ready to answer with **FlowControl** messages.
 
 #### Discovery process for nodes and SM-CAN slaves
 *This process takes place after the SM-CAN master negotiation process. Please note that both nodes and SM-CAN slaves are referred to as “nodes” in this section.*
 
-1. All SM-CANs shall participate in the Discovery process on their Processing nodes according to VN. See VN-CAN high level protocol for further details.
+1. All SM-CANs shall participate in the Discovery process on their Processing nodes according to VN. See *high level* protocol for further details.
 2. All nodes shall listen to any **Normal CAN message** (such as the **CANMasterAssigned** message). Once the node receives a 
 **Normal CAN message** this indicates that an SM-CAN master has been assigned.
 3. All nodes shall then start to send **RequestCANAddress** messages at regular intervals.
@@ -226,16 +232,21 @@ All SM-CANs shall respond to **DiscoveryRequest** messages with a **ComponentTyp
 
 
 #### Route discovery process to overlying units
-Whenever a the CAN subnet sends a VN message it can conclude that it can route VN messages to the sender of that VN message, 
-*assuming it has not received a message from this address*.
-For this reason, the unit will send a **AddressAnswer** message containing the sender's logical address and the unit's own CAN address.  <br/>
+The VN-CAN subnet protocol of each unit shall keep track of which logical addresses it has sent messages to and received from.   <br/>
+Whenever a the CAN subnet sends a VN message from a given logical address, *that it has not received a message from*, it can conclude that it can route VN messages to the sender of that VN message.
+For this reason, the unit will send a **AddressAnswer** message containing the sender's logical address and the unit's own CAN address. 
+
 The **AddressAnswer** message will inform all other units that VN messages addressed to this logical address shall be sent to this CAN address, thus the VN message can be sent directly to the receiver. <br/>
 If this is not done it is very likely that the only source of routing information that units will get is **DistributeRoute** messages, which will mean that VN messages will be sent via the unit that sent a **DistributeRoute** message rather than directly to the receiver. <br/>
 *Example:* Unit A is aware of units B and C and sends a **DistributeRoute** message to B about C, and vice versa. 
-B wil now know that if it wants to send a message to C it can do so by sending it to A, but it will not know on which CAN address that C 
+B will now know that if it wants to send a message to C it can do so by sending it to A, but it will not know on which CAN address that C 
 resides on and can therefore not send the message directly. <br/>
 When C sends an **AddressAnswer** message B will know to which CAN address it shall send the message, and it can therefore send the 
 message directly.
+
+*Routing information gotten from **AddressAnswer** messages is considered more reliable than other sources of routing information. Therefore, routing information from **AddressAnswer** messages
+shall replace routing information from other sources. For the same reason routing information from  **AddressAnswer** messages **shall not** be replaced by routing information from other sources, 
+such as **DistributeRoute** messages.*
 
 A unit may periodically resend **AddressAnswer** messages regarding all logical addresses that it has sent but not received messages from. 
 This will inform units that may not have been active when the first **AddressAnswer** messages were sent.

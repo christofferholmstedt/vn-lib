@@ -4,7 +4,7 @@ with VN;
 with VN.Message;
 with VN.SM_Application_Layer_Logic;
 
-package body Subnet_Manager_Local is
+package body Subnet_Manager_Local_X is
 
    task body SM_L is
       use Ada.Real_Time;
@@ -17,10 +17,10 @@ package body Subnet_Manager_Local is
       -------------------------------
       --- Subnet Manager Settings ---
       -------------------------------
-      Name     : aliased String := "SM_L ";
+      Name     : aliased String := "SM_X ";
       SM_Logic : VN.SM_Application_Layer_Logic.SM_Logic_Type(
-                        Global_Settings.Com_SM_L'Access,
-                        Global_Settings.CUUID_SM'Access,
+                        Global_Settings.Com_SM_X'Access,
+                        Global_Settings.CUUID_SM_X'Access,
                         Name'Access,
                         Global_Settings.Logger'Access);
       -------------------------------
@@ -50,4 +50,4 @@ package body Subnet_Manager_Local is
    -- Start one instance of the SM-L
    SM_L1: SM_L(20, Global_Settings.Cycle_Time_SM_L, 80, 3);
 
-end Subnet_Manager_Local;
+end Subnet_Manager_Local_X;

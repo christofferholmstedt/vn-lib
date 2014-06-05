@@ -1,6 +1,6 @@
 with System;
 
-package Subnet_Manager_Local is
+package Subnet_Manager_Local_X is
 
    task type SM_L(Pri : System.Priority;
                      Cycle_Time : Positive;
@@ -9,4 +9,4 @@ package Subnet_Manager_Local is
       pragma Priority(Pri);
    end SM_L;
 
-end Subnet_Manager_Local;
+end Subnet_Manager_Local_X;
