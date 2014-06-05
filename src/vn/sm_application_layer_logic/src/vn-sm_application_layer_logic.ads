@@ -18,9 +18,9 @@ with Logging.Print_Out;
 package VN.SM_Application_Layer_Logic is
 
    type SM_Logic_Type(Com_Object       : VN.Communication.Com_Access;
-                      CUUID_In         : VN.VN_CUUID;
-                      Debug_ID_String2 : String;
-                      Logger2          : Logging.Print_Out.Print_Out_Logger)
+                      CUUID_In         : access VN.VN_CUUID;
+                      Debug_ID_String2 : access String;
+                      Logger2          : access Logging.Print_Out.Print_Out_Logger)
       is tagged limited private;
 
    procedure Receive_Loop(This: in out SM_Logic_Type);
@@ -29,17 +29,17 @@ package VN.SM_Application_Layer_Logic is
    private
 
    type SM_Logic_Type(Com_Object       : VN.Communication.Com_Access;
-                      CUUID_In         : VN.VN_CUUID;
-                      Debug_ID_String2 : String;
-                      Logger2          : Logging.Print_Out.Print_Out_Logger)
-         is tagged limited with
+                      CUUID_In         : access VN.VN_CUUID;
+                      Debug_ID_String2 : access String;
+                      Logger2          : access Logging.Print_Out.Print_Out_Logger)
+         is tagged limited
       record
          Com               : VN.Communication.Com_Access := Com_Object;
-         CUUID             : VN.VN_CUUID := CUUID_In;
-         Debug_ID_String   : String(1 .. 5) := Debug_ID_String2;
+         CUUID             : VN.VN_CUUID := CUUID_In.all;
+         Debug_ID_String   : String(1 .. 5) := Debug_ID_String2.all;
          Logical_Address   : VN.VN_Logical_Address;
          Component_Type    : VN.Message.VN_Component_Type;
-         Logger            : Logging.Print_Out.Print_Out_Logger := Logger2;
+         Logger            : Logging.Print_Out.Print_Out_Logger := Logger2.all;
       end record;
 
       package VN_Logical_Address_Buffer is

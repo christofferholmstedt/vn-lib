@@ -17,18 +17,18 @@ package body Subnet_Manager_Local is
       -------------------------------
       --- Subnet Manager Settings ---
       -------------------------------
+      Name     : aliased String := "SM_L ";
       SM_Logic : VN.SM_Application_Layer_Logic.SM_Logic_Type(
                         Global_Settings.Com_SM_L'Access,
-                        Global_Settings.CUUID_SM,
-                        "SM_L ",
-                        Global_Settings.Logger);
+                        Global_Settings.CUUID_SM'Access,
+                        Name'Access,
+                        Global_Settings.Logger'Access);
       -------------------------------
       -------------------------------
       -------------------------------
 
    begin
       Global_Settings.Start_Time.Get(Next_Period);
-      VN.Text_IO.Put_Line(SM_Logic.Debug_ID_String & "STAT: Starts.");
 
       loop
          delay until Next_Period;
@@ -44,9 +44,6 @@ package body Subnet_Manager_Local is
          exit when Counter_For_Testing = 60;
       end loop;
       ----------------------------
-
-      VN.Text_IO.Put_Line(SM_Logic.Debug_ID_String & "STAT: Stop. Logical Address: " &
-                                 SM_Logic.Logical_Address'Img);
 
    end SM_L;
 
