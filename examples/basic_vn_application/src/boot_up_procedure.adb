@@ -8,7 +8,7 @@ with Lookup_Service;
 with Application;
 with App2;
 
-procedure Main is
+procedure Boot_Up_Procedure is
 begin
    null;
    Global_Settings.Com_Application.Init;
@@ -32,4 +32,4 @@ begin
    Global_Settings.Com_SM_H.Add_Interface(Global_Settings.PO_Router_SM_H'Access);
    Global_Settings.PO_Router_SM_H.Add_Interface(Global_Settings.PO_Wrapper_SM_H_To_SM_X'Access);
 
-end Main;
+end Boot_Up_Procedure;
