@@ -99,7 +99,7 @@ package body Central_Addressing_Service is
 
             VN.Text_IO.Put("CAS  SEND: ");
             Global_Settings.Logger.Log(Basic_Msg);
-            Global_Settings.Com_Application.Send(Basic_Msg, Send_Status);
+            Global_Settings.Com_CAS.Send(Basic_Msg, Send_Status);
 
         end if;
 
