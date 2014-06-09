@@ -9,7 +9,7 @@ with Application;
 with App2;
 with App_K;
 
-procedure Main is
+procedure Boot_Up_Procedure is
 begin
    null;
    Global_Settings.Com_Application.Init;
@@ -39,4 +39,4 @@ begin
    Global_Settings.Com_SM_K.Add_Interface(Global_Settings.PO_Router_SM_K'Access);
    Global_Settings.PO_Router_SM_K.Add_Interface(Global_Settings.PO_Wrapper_SM_K_To_SM_X'Access);
    Global_Settings.PO_Router_SM_K.Add_Interface(Global_Settings.PO_Wrapper_SM_K_To_App_K'Access);
-end Main;
+end Boot_Up_Procedure;
