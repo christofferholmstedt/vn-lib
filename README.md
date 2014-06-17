@@ -1,5 +1,19 @@
-VN-Lib
-=======
+Christoffers Old-dev branch "VN-Lib"
+====================================
+The differences between "old-dev" and "development" branch are quite few. The
+important thing to remember is that the "development" branch is the latest code
+that has been tested on the SmartFusion2 cards.
+
+The old-dev branch is left for reference as it includes some refactoring to the
+application layer code but the changes didn't run on SmartFusion for some
+reason.
+
+These changes are mostly in the "basic vn application" example and "sm
+application layer logic" package.
+
+
+Original README below
+=====================
 Library parts of the "Virtual Network" implementation.
 
 ### Keywords
